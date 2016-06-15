@@ -119,7 +119,7 @@
         </subsystem>
         <subsystem xmlns="urn:wildfly:elytron:1.0">
             <security-domains>
-                <security-domain name="ManagementDomain" default-realm="ManagementRealm">
+                <security-domain name="ManagementDomain" default-realm="ManagementRealm" role-mapper="combined-role-mapper" permission-mapper="login-permission-mapper">
                     <realm name="ManagementRealm" role-decoder="groups-to-roles"/>
                 </security-domain>
             </security-domains>
@@ -131,6 +131,13 @@
             </security-realms>
             <mappers>
                 <simple-role-decoder name="groups-to-roles" attribute="groups"/>
+                <constant-role-mapper name="constant-roles" roles="All"/>
+                <logical-role-mapper name="combined-role-mapper" logical-operation="or" left="constant-roles"/>
+                <simple-permission-mapper name="login-permission-mapper">
+                    <permission-mapping roles="All">
+                        <permission class-name="org.wildfly.security.auth.permission.LoginPermission"/>
+                    </permission-mapping>
+                </simple-permission-mapper>
             </mappers>
             <http>
                 <http-server-authentication name="management-http-authentication" http-server-factory="global" security-domain="ManagementDomain">

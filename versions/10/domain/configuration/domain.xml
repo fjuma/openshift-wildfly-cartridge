@@ -138,10 +138,10 @@
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:ejb3:5.0">
                 <session-bean>
-                    <stateful default-access-timeout="5000" cache-ref="simple" passivation-disabled-cache-ref="simple"/>
                     <stateless>
                         <bean-instance-pool-ref pool-name="slsb-strict-max-pool"/>
                     </stateless>
+                    <stateful default-access-timeout="5000" cache-ref="simple" passivation-disabled-cache-ref="simple"/>
                     <singleton default-access-timeout="5000"/>
                 </session-bean>
                 <pools>
@@ -153,7 +153,7 @@
                 </pools>
                 <caches>
                     <cache name="simple"/>
-                    <cache name="distributable" aliases="passivating clustered" passivation-store-ref="infinispan"/>
+                    <cache name="distributable" passivation-store-ref="infinispan" aliases="passivating clustered"/>
                 </caches>
                 <passivation-stores>
                     <passivation-store name="infinispan" cache-container="ejb" max-size="10000"/>
@@ -196,6 +196,9 @@
                         <transaction mode="BATCH"/>
                         <file-store passivation="false" purge="false"/>
                     </local-cache>
+                    <local-cache name="concurrent">
+                        <file-store passivation="true" purge="false"/>
+                    </local-cache>
                 </cache-container>
                 <cache-container name="ejb" aliases="sfsb" default-cache="passivation" module="org.wildfly.clustering.ejb.infinispan">
                     <local-cache name="passivation">
@@ -211,11 +214,6 @@
                 </cache-container>
                 <cache-container name="hibernate" default-cache="local-query" module="org.hibernate.infinispan">
                     <local-cache name="entity">
-                        <transaction mode="NON_XA"/>
-                        <eviction strategy="LRU" max-entries="10000"/>
-                        <expiration max-idle="100000"/>
-                    </local-cache>
-                    <local-cache name="immutable-entity">
                         <transaction mode="NON_XA"/>
                         <eviction strategy="LRU" max-entries="10000"/>
                         <expiration max-idle="100000"/>
@@ -294,6 +292,14 @@
                         <authorization>
                             <policy-module code="Delegating" flag="required"/>
                         </authorization>
+                    </security-domain>
+                    <security-domain name="jaspitest" cache-type="default">
+                        <authentication-jaspi>
+                            <login-module-stack name="dummy">
+                                <login-module code="Dummy" flag="optional"/>
+                            </login-module-stack>
+                            <auth-module code="Dummy"/>
+                        </authentication-jaspi>
                     </security-domain>
                 </security-domains>
             </subsystem>
@@ -434,10 +440,10 @@
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:ejb3:5.0">
                 <session-bean>
-                    <stateful default-access-timeout="5000" cache-ref="distributable" passivation-disabled-cache-ref="simple"/>
                     <stateless>
                         <bean-instance-pool-ref pool-name="slsb-strict-max-pool"/>
                     </stateless>
+                    <stateful default-access-timeout="5000" cache-ref="distributable" passivation-disabled-cache-ref="simple"/>
                     <singleton default-access-timeout="5000"/>
                 </session-bean>
                 <pools>
@@ -449,7 +455,7 @@
                 </pools>
                 <caches>
                     <cache name="simple"/>
-                    <cache name="distributable" aliases="passivating clustered" passivation-store-ref="infinispan"/>
+                    <cache name="distributable" passivation-store-ref="infinispan" aliases="passivating clustered"/>
                 </caches>
                 <passivation-stores>
                     <passivation-store name="infinispan" cache-container="ejb" max-size="10000"/>
@@ -489,6 +495,9 @@
                         <transaction mode="BATCH"/>
                         <file-store/>
                     </distributed-cache>
+                    <distributed-cache name="concurrent" mode="SYNC" l1-lifespan="0" owners="2">
+                        <file-store/>
+                    </distributed-cache>
                 </cache-container>
                 <cache-container name="ejb" aliases="sfsb" default-cache="dist" module="org.wildfly.clustering.ejb.infinispan">
                     <transport lock-timeout="60000"/>
@@ -500,15 +509,15 @@
                 </cache-container>
                 <cache-container name="hibernate" default-cache="local-query" module="org.hibernate.infinispan">
                     <transport lock-timeout="60000"/>
+                    <local-cache name="local-query">
+                        <eviction strategy="LRU" max-entries="10000"/>
+                        <expiration max-idle="100000"/>
+                    </local-cache>
                     <invalidation-cache name="entity" mode="SYNC">
                         <transaction mode="NON_XA"/>
                         <eviction strategy="LRU" max-entries="10000"/>
                         <expiration max-idle="100000"/>
                     </invalidation-cache>
-                    <local-cache name="local-query">
-                        <eviction strategy="LRU" max-entries="10000"/>
-                        <expiration max-idle="100000"/>
-                    </local-cache>
                     <replicated-cache name="timestamps" mode="ASYNC"/>
                 </cache-container>
             </subsystem>
@@ -622,6 +631,14 @@
                         <authorization>
                             <policy-module code="Delegating" flag="required"/>
                         </authorization>
+                    </security-domain>
+                    <security-domain name="jaspitest" cache-type="default">
+                        <authentication-jaspi>
+                            <login-module-stack name="dummy">
+                                <login-module code="Dummy" flag="optional"/>
+                            </login-module-stack>
+                            <auth-module code="Dummy"/>
+                        </authentication-jaspi>
                     </security-domain>
                 </security-domains>
             </subsystem>
@@ -770,10 +787,10 @@
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:ejb3:5.0">
                 <session-bean>
-                    <stateful default-access-timeout="5000" cache-ref="simple" passivation-disabled-cache-ref="simple"/>
                     <stateless>
                         <bean-instance-pool-ref pool-name="slsb-strict-max-pool"/>
                     </stateless>
+                    <stateful default-access-timeout="5000" cache-ref="simple" passivation-disabled-cache-ref="simple"/>
                     <singleton default-access-timeout="5000"/>
                 </session-bean>
                 <mdb>
@@ -789,7 +806,7 @@
                 </pools>
                 <caches>
                     <cache name="simple"/>
-                    <cache name="distributable" aliases="passivating clustered" passivation-store-ref="infinispan"/>
+                    <cache name="distributable" passivation-store-ref="infinispan" aliases="passivating clustered"/>
                 </caches>
                 <passivation-stores>
                     <passivation-store name="infinispan" cache-container="ejb" max-size="10000"/>
@@ -833,6 +850,9 @@
                         <transaction mode="BATCH"/>
                         <file-store passivation="false" purge="false"/>
                     </local-cache>
+                    <local-cache name="concurrent">
+                        <file-store passivation="true" purge="false"/>
+                    </local-cache>
                 </cache-container>
                 <cache-container name="ejb" aliases="sfsb" default-cache="passivation" module="org.wildfly.clustering.ejb.infinispan">
                     <local-cache name="passivation">
@@ -848,11 +868,6 @@
                 </cache-container>
                 <cache-container name="hibernate" default-cache="local-query" module="org.hibernate.infinispan">
                     <local-cache name="entity">
-                        <transaction mode="NON_XA"/>
-                        <eviction strategy="LRU" max-entries="10000"/>
-                        <expiration max-idle="100000"/>
-                    </local-cache>
-                    <local-cache name="immutable-entity">
                         <transaction mode="NON_XA"/>
                         <eviction strategy="LRU" max-entries="10000"/>
                         <expiration max-idle="100000"/>
@@ -960,6 +975,14 @@
                         <authorization>
                             <policy-module code="Delegating" flag="required"/>
                         </authorization>
+                    </security-domain>
+                    <security-domain name="jaspitest" cache-type="default">
+                        <authentication-jaspi>
+                            <login-module-stack name="dummy">
+                                <login-module code="Dummy" flag="optional"/>
+                            </login-module-stack>
+                            <auth-module code="Dummy"/>
+                        </authentication-jaspi>
                     </security-domain>
                 </security-domains>
             </subsystem>
@@ -1100,10 +1123,10 @@
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:ejb3:5.0">
                 <session-bean>
-                    <stateful default-access-timeout="5000" cache-ref="distributable" passivation-disabled-cache-ref="simple"/>
                     <stateless>
                         <bean-instance-pool-ref pool-name="slsb-strict-max-pool"/>
                     </stateless>
+                    <stateful default-access-timeout="5000" cache-ref="distributable" passivation-disabled-cache-ref="simple"/>
                     <singleton default-access-timeout="5000"/>
                 </session-bean>
                 <mdb>
@@ -1119,7 +1142,7 @@
                 </pools>
                 <caches>
                     <cache name="simple"/>
-                    <cache name="distributable" aliases="passivating clustered" passivation-store-ref="infinispan"/>
+                    <cache name="distributable" passivation-store-ref="infinispan" aliases="passivating clustered"/>
                 </caches>
                 <passivation-stores>
                     <passivation-store name="infinispan" cache-container="ejb" max-size="10000"/>
@@ -1160,6 +1183,9 @@
                         <transaction mode="BATCH"/>
                         <file-store/>
                     </distributed-cache>
+                    <distributed-cache name="concurrent" mode="SYNC" l1-lifespan="0" owners="2">
+                        <file-store/>
+                    </distributed-cache>
                 </cache-container>
                 <cache-container name="ejb" aliases="sfsb" default-cache="dist" module="org.wildfly.clustering.ejb.infinispan">
                     <transport lock-timeout="60000"/>
@@ -1171,15 +1197,15 @@
                 </cache-container>
                 <cache-container name="hibernate" default-cache="local-query" module="org.hibernate.infinispan">
                     <transport lock-timeout="60000"/>
+                    <local-cache name="local-query">
+                        <eviction strategy="LRU" max-entries="10000"/>
+                        <expiration max-idle="100000"/>
+                    </local-cache>
                     <invalidation-cache name="entity" mode="SYNC">
                         <transaction mode="NON_XA"/>
                         <eviction strategy="LRU" max-entries="10000"/>
                         <expiration max-idle="100000"/>
                     </invalidation-cache>
-                    <local-cache name="local-query">
-                        <eviction strategy="LRU" max-entries="10000"/>
-                        <expiration max-idle="100000"/>
-                    </local-cache>
                     <replicated-cache name="timestamps" mode="ASYNC"/>
                 </cache-container>
             </subsystem>
@@ -1327,6 +1353,14 @@
                             <policy-module code="Delegating" flag="required"/>
                         </authorization>
                     </security-domain>
+                    <security-domain name="jaspitest" cache-type="default">
+                        <authentication-jaspi>
+                            <login-module-stack name="dummy">
+                                <login-module code="Dummy" flag="optional"/>
+                            </login-module-stack>
+                            <auth-module code="Dummy"/>
+                        </authentication-jaspi>
+                    </security-domain>
                 </security-domains>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:security-manager:1.0">
@@ -1399,6 +1433,9 @@
     <interfaces>
         <interface name="management"/>
         <interface name="public"/>
+        <interface name="private">
+            <inet-address value="${jboss.bind.address.private:127.0.0.1}"/>
+        </interface>
         <interface name="unsecure">
             <inet-address value="${jboss.bind.address.unsecure:127.0.0.1}"/>
         </interface>
@@ -1420,11 +1457,11 @@
             <socket-binding name="ajp" port="${jboss.ajp.port:8009}"/>
             <socket-binding name="http" port="${jboss.http.port:8080}"/>
             <socket-binding name="https" port="${jboss.https.port:8443}"/>
-            <socket-binding name="jgroups-mping" port="0" multicast-address="${jboss.default.multicast.address:230.0.0.4}" multicast-port="45700"/>
-            <socket-binding name="jgroups-tcp" port="7600"/>
-            <socket-binding name="jgroups-tcp-fd" port="57600"/>
-            <socket-binding name="jgroups-udp" port="55200" multicast-address="${jboss.default.multicast.address:230.0.0.4}" multicast-port="45688"/>
-            <socket-binding name="jgroups-udp-fd" port="54200"/>
+            <socket-binding name="jgroups-mping" interface="private" port="0" multicast-address="${jboss.default.multicast.address:230.0.0.4}" multicast-port="45700"/>
+            <socket-binding name="jgroups-tcp" interface="private" port="7600"/>
+            <socket-binding name="jgroups-tcp-fd" interface="private" port="57600"/>
+            <socket-binding name="jgroups-udp" interface="private" port="55200" multicast-address="${jboss.default.multicast.address:230.0.0.4}" multicast-port="45688"/>
+            <socket-binding name="jgroups-udp-fd" interface="private" port="54200"/>
             <socket-binding name="modcluster" port="0" multicast-address="224.0.1.105" multicast-port="23364"/>
             <socket-binding name="txn-recovery-environment" port="4712"/>
             <socket-binding name="txn-status-manager" port="4713"/>
@@ -1452,11 +1489,11 @@
             <socket-binding name="https" port="${jboss.https.port:8443}"/>
             <socket-binding name="iiop" interface="unsecure" port="3528"/>
             <socket-binding name="iiop-ssl" interface="unsecure" port="3529"/>
-            <socket-binding name="jgroups-mping" port="0" multicast-address="${jboss.default.multicast.address:230.0.0.4}" multicast-port="45700"/>
-            <socket-binding name="jgroups-tcp" port="7600"/>
-            <socket-binding name="jgroups-tcp-fd" port="57600"/>
-            <socket-binding name="jgroups-udp" port="55200" multicast-address="${jboss.default.multicast.address:230.0.0.4}" multicast-port="45688"/>
-            <socket-binding name="jgroups-udp-fd" port="54200"/>
+            <socket-binding name="jgroups-mping" interface="private" port="0" multicast-address="${jboss.default.multicast.address:230.0.0.4}" multicast-port="45700"/>
+            <socket-binding name="jgroups-tcp" interface="private" port="7600"/>
+            <socket-binding name="jgroups-tcp-fd" interface="private" port="57600"/>
+            <socket-binding name="jgroups-udp" interface="private" port="55200" multicast-address="${jboss.default.multicast.address:230.0.0.4}" multicast-port="45688"/>
+            <socket-binding name="jgroups-udp-fd" interface="private" port="54200"/>
             <socket-binding name="modcluster" port="0" multicast-address="224.0.1.105" multicast-port="23364"/>
             <socket-binding name="txn-recovery-environment" port="4712"/>
             <socket-binding name="txn-status-manager" port="4713"/>

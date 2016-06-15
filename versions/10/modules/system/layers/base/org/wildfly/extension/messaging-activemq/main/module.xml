@@ -28,7 +28,7 @@
     </properties>
 
     <resources>
-        <resource-root path="wildfly-messaging-activemq-10.0.0.CR5-Elytron5.jar"/>
+        <resource-root path="wildfly-messaging-activemq-10.1.0.Final-Elytron1.jar"/>
         <resource-root path="artemis-wildfly-integration-1.0.2.jar"/>
     </resources>
 
@@ -39,6 +39,7 @@
         <module name="javax.api"/>
         <module name="javax.enterprise.api"/>
         <module name="javax.jms.api"/>
+        <module name="javax.resource.api" />
         <module name="javax.transaction.api"/>
         <module name="org.apache.activemq.artemis"/>
         <module name="org.apache.activemq.artemis.ra"/>

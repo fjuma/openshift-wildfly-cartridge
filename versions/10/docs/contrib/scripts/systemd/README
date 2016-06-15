@@ -7,8 +7,8 @@
 
 == Install WildFly
 
-    # tar xvzf wildfly-9.0.1.Final.tar.gz -C /opt
-    # ln -s /opt/wildfly-9.0.1.Final /opt/wildfly
+    # tar xvzf wildfly-10.0.0.Final.tar.gz -C /opt
+    # ln -s /opt/wildfly-10.0.0.Final /opt/wildfly
     # chown -R wildfly:wildfly /opt/wildfly
 
 == Configure systemd
@@ -21,5 +21,5 @@
 
 == Start and enable
 
-    # systemd start wildfly.service
-    # systemd enable wildfly.service
+    # systemctl start wildfly.service
+    # systemctl enable wildfly.service
